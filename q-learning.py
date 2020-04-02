@@ -19,7 +19,7 @@ class NaNTensorException(Exception):
 class InfTensorException(Exception):
   pass
 
-from base_layer import Network,ReplayMemory
+from base_layer import Network
 
 # Implementation of Experience Replay
 class ExperienceReplay(object):
@@ -67,8 +67,8 @@ class DeepQNetwork():
 
     # Decides what the next action should be
     def select_action(self, state):
-        probs = F.softmax(self.model(Variable(state, volatile=True)) * 100)
-        action = probs.multinomial()
+        probs = F.softmax(self.model(Variable(state, volatile=True)) * 7)
+        action = probs.multinomial(1)
         return action.data[0,0]
 
     def learn(self, batch_state, batch_next_state, batch_reward, batch_action):
@@ -77,7 +77,7 @@ class DeepQNetwork():
         target = self.gamma * next_outputs + batch_reward
         td_loss = F.smooth_l1_loss(outputs, target)
         self.optimizer.zero_grad()
-        td_loss.backward(retain_variables=True)
+        td_loss.backward(retain_graph=True)
         self.optimizer.step()
 
     def update(self, reward, new_signal):
@@ -102,7 +102,20 @@ class DeepQNetwork():
     def score(self):
         return sum(self.reward_average) / (len(self.reward_average) + 1.)
     
-    #Unit test for q-learning 
+    def save(self):
+        torch.save({'state_dict': self.model.state_dict(), 'optimizer': self.optimizer.state_dict()}, 'saved_ai.pth')
+
+    def load(self):
+        if os.path.isfile('saved_ai.pth'):
+            print("Loading checkpoint...")
+            checkpoint = torch.load('saved_ai.pth')
+            self.model.load_state_dict(checkpoint['state_dict'])
+            self.optimizer.load_state_dict(checkpoint['optimizer'])
+            print("Done!")
+        else:
+            print("No checkpoint found...")
+    
+    #Unit test for q-learning
     def test(self):
         self.after_param = [ np[1] for np in self.model.named_parameters() ]
         print('After save', self.after_param)

@@ -1,5 +1,5 @@
 # Self Driving Car and maps with canvas creation
-# Interface between Ai and graphics for self driving car 
+# Interface between Ai and graphics for self driving car
 import numpy
 from random import random, randint
 import matplotlib.pyplot as plt
@@ -21,7 +21,7 @@ from Qlearning import DeepQNetwork
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 
 
-#variabes for kerping the track of last position of car 
+#variabes for kerping the track of last position of car
 last_pos_x = 0
 last_pos_y = 0
 n_points = 0
@@ -73,7 +73,7 @@ class Car(Widget):
     velocity_y = NumericProperty(0)
     velocity = ReferenceListProperty(velocity_x, velocity_y)
 
-    # checking for obstacles on front 
+    # checking for obstacles on front
     sensor1_x = NumericProperty(0)
     sensor1_y = NumericProperty(0)
     sensor1 = ReferenceListProperty(sensor1_x, sensor1_y)
@@ -265,6 +265,23 @@ class CarApp(App):
         parent.add_widget(savebtn)
         parent.add_widget(loadbtn)
         return parent
+    
+    def clear_canvas(self, obj):
+        global sand
+        self.painter.canvas.clear()
+        sand = numpy.zeros((length,width))
+
+    # Saves the AI
+    def save(self, obj):
+        print("Saving the AI...")
+        brain.save()
+        plt.plot(scores)
+        plt.show()
+
+    # Loads the AI
+    def load(self, obj):
+        print("Loading the last saved AI...")
+        brain.load()
 
 #Initialisation of code
 if __name__ == '__main__':
