@@ -12,6 +12,7 @@ from torch.autograd import Variable
 from torchtest import assert_vars_same
 import torch_testing as tt
 import unittest
+from testsuite import TestSame,TestNan,TestInfinite
 
 class NaNTensorException(Exception):
   pass
@@ -62,7 +63,7 @@ class DeepQNetwork():
         self.last_reward = 0
         
         #for testing purpose
-        print('Our list of parameters', [ np[1] for np in self.model.named_parameters() ])
+        #print('Our list of parameters', [ np[1] for np in self.model.named_parameters() ])
         self.initial_param = [ np[1] for np in self.model.named_parameters()]
 
     # Decides what the next action should be
@@ -104,7 +105,16 @@ class DeepQNetwork():
     
     def save(self):
         torch.save({'state_dict': self.model.state_dict(), 'optimizer': self.optimizer.state_dict()}, 'saved_ai.pth')
+        same = TestSame()
+        self.after_param = [ np[1] for np in self.model.named_parameters() ]
+        #print('After save', self.after_param)
+        same.runTest(self.initial_param,self.after_param)
+        nan = TestNan()
+        nan.runTest(self.after_param)
+        inf = TestInfinite()
+        inf.runTest(self.after_param)
 
+        
     def load(self):
         if os.path.isfile('saved_ai.pth'):
             print("Loading checkpoint...")
@@ -114,34 +124,6 @@ class DeepQNetwork():
             print("Done!")
         else:
             print("No checkpoint found...")
-    
-    #Unit test for q-learning
-    def test(self):
-        self.after_param = [ np[1] for np in self.model.named_parameters() ]
-        print('After save', self.after_param)
-        #####test for same params
-        count=0
-        for i,a_val in enumerate(self.after_param):
-            if(tt.assert_equal(a_val, self.initial_param[i])== None):
-                print('tensor unit test [', i,']passed')
-                count=count+1
-        if(count==4):
-            print('unit test for Q-learning passed')
-        
-        
-        ###test for Nan
-        for val in self.after_param:
-         try:
-            assert not torch.isnan(val).byte().any()
-         except AssertionError:
-            raise NaNTensorException("There was a NaN value in tensor")
-            
-        ###test for infinite values
-        for val in self.after_param:
-            try:
-                assert torch.isfinite(val).byte().any()
-            except AssertionError:
-                raise InfTensorException("There was an Inf value in tensor")
         
         
 

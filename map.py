@@ -1,5 +1,5 @@
 # Self Driving Car and maps with canvas creation
-# Interface between Ai and graphics for self driving car
+# Interface between Ai and graphics for self driving car 
 import numpy
 from random import random, randint
 import matplotlib.pyplot as plt
@@ -17,11 +17,12 @@ from kivy.clock import Clock
 
 from Qlearning import DeepQNetwork
 
+
 # Adding this line if we don't want the right click to put a red point
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 
 
-#variabes for kerping the track of last position of car
+#variabes for kerping the track of last position of car 
 last_pos_x = 0
 last_pos_y = 0
 n_points = 0
@@ -73,7 +74,7 @@ class Car(Widget):
     velocity_y = NumericProperty(0)
     velocity = ReferenceListProperty(velocity_x, velocity_y)
 
-    # checking for obstacles on front
+    # checking for obstacles on front 
     sensor1_x = NumericProperty(0)
     sensor1_y = NumericProperty(0)
     sensor1 = ReferenceListProperty(sensor1_x, sensor1_y)
